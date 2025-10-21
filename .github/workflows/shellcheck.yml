@@ -1,0 +1,50 @@
+name: Shellcheck
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  shellcheck:
+    name: Run ShellCheck
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install ShellCheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: Find shell scripts
+        id: list_scripts
+        run: |
+          # Ajuste os caminhos conforme o repo
+          files=$(git ls-files | grep -E '\.sh$|^scripts/|^src/scripts/' || true)
+          if [ -z "$files" ]; then
+            echo "No shell scripts found."
+            echo "found=false" >> $GITHUB_OUTPUT
+          else
+            echo "$files" > shell_files.txt
+            echo "Shell scripts to check:"
+            cat shell_files.txt
+            echo "found=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run ShellCheck
+        if: steps.list_scripts.outputs.found == 'true'
+        run: |
+          # Exemplo de severidade: -S warning (menos estrito). Para CI mais rígido use -S error
+          xargs -a shell_files.txt -r shellcheck -S warning --external-sources --format=gcc
+
+      - name: Upload report (optional)
+        if: steps.list_scripts.outputs.found == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: shellcheck-report
+          path: shell_files.txt
