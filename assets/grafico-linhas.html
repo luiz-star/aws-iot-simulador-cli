@@ -1,76 +1,130 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gráfico de Temperatura e Umidade</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gráfico de Temperatura e Umidade</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root{
+    --t:#e74c3c; --u:#2980b9; --bg:#ffffff; --card:#f7fafc; --bd:#e5edf5;
+  }
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:#222}
+  header{padding:14px 16px;text-align:center;font-weight:700}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 12px 32px}
+  .card{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:14px}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .toolbar .left{display:flex;gap:8px;align-items:center}
+  input[type="text"]{width:360px;max-width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:8px}
+  button{padding:8px 12px;border:1px solid var(--bd);background:var(--card);border-radius:8px;cursor:pointer}
+  button:hover{background:#eef3f9}
+  .legend{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap}
+  .key{display:flex;align-items:center;gap:6px}
+  .sw{width:14px;height:6px;border-radius:3px}
+  canvas{max-height:65vh}
+</style>
 </head>
 <body>
-    <div style="width: 75%; margin: auto;">
-        <canvas id="tempUmidadeChart"></canvas>
+<header>Gráfico de Temperatura e Umidade</header>
+<div class="wrap">
+  <div class="card">
+    <div class="toolbar">
+      <div class="left">
+        <input id="dataInput" type="text" placeholder='Dados (JSON) ou cole: {"x":[0,1,2,3,4],"t":[25,26,27,28,29],"u":[50,51,52,53,54]}'>
+        <button id="btnAplicar">Aplicar dados</button>
+      </div>
+      <div class="right">
+        <button id="btnPNG">Exportar PNG</button>
+      </div>
     </div>
-    <script>
-        const ctx = document.getElementById('tempUmidadeChart').getContext('2d');
-        const tempUmidadeChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: [0, 1, 2, 3, 4], // Iterações
-                datasets: [
-                    {
-                        label: 'Temperatura (°C)',
-                        data: [25, 26, 27, 28, 29],
-                        borderColor: 'red',
-                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                        fill: true,
-                        tension: 0.4,
-                    },
-                    {
-                        label: 'Umidade (%)',
-                        data: [50, 51, 52, 53, 54],
-                        borderColor: 'blue',
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        fill: true,
-                        tension: 0.4,
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Gráfico de Temperatura e Umidade',
-                        font: {
-                            size: 18
-                        }
-                    },
-                    legend: {
-                        position: 'top',
-                    }
-                },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Iteração', // Rótulo do eixo X
-                            font: {
-                                size: 14
-                            }
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Valor', // Rótulo do eixo Y
-                            font: {
-                                size: 14
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    </script>
+
+    <div style="position:relative;width:100%;">
+      <canvas id="tempUmidadeChart"></canvas>
+    </div>
+    <div class="legend">
+      <span class="key"><span class="sw" style="background:var(--t)"></span>Temperatura (°C)</span>
+      <span class="key"><span class="sw" style="background:var(--u)"></span>Umidade (%)</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Dados iniciais
+  let dados = {
+    x:  [0,1,2,3,4],
+    t:  [25,26,27,28,29],
+    u:  [50,51,52,53,54]
+  };
+
+  const ctx = document.getElementById('tempUmidadeChart').getContext('2d');
+
+  const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: dados.x,
+      datasets: [
+        {
+          label: 'Temperatura (°C)',
+          data: dados.t,
+          borderColor: getComputedStyle(document.documentElement).getPropertyValue('--t').trim(),
+          backgroundColor: 'rgba(231,76,60,.15)',
+          fill: true,
+          pointRadius: 3,
+          tension: 0.25
+        },
+        {
+          label: 'Umidade (%)',
+          data: dados.u,
+          borderColor: getComputedStyle(document.documentElement).getPropertyValue('--u').trim(),
+          backgroundColor: 'rgba(41,128,185,.15)',
+          fill: true,
+          pointRadius: 3,
+          tension: 0.25
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'nearest', intersect: false },
+      plugins: {
+        legend: { display: true, position: 'top' },
+        tooltip: { enabled: true },
+        title: {
+          display: true,
+          text: 'Gráfico de Temperatura e Umidade'
+        }
+      },
+      scales: {
+        x: { title: { display: true, text: 'Iteração' } },
+        y: { title: { display: true, text: 'Valor' }, beginAtZero: false }
+      }
+    }
+  });
+
+  // Aplicar dados via campo JSON
+  document.getElementById('btnAplicar').onclick = () => {
+    const txt = document.getElementById('dataInput').value.trim();
+    if (!txt) return alert('Cole um JSON no campo, ex: {"x":[0,1], "t":[25,26], "u":[50,51]}');
+    try{
+      const j = JSON.parse(txt);
+      if (!j.x || !j.t || !j.u) throw new Error('JSON precisa ter x, t e u');
+      dados = j;
+      chart.data.labels = j.x;
+      chart.data.datasets[0].data = j.t;
+      chart.data.datasets[1].data = j.u;
+      chart.update();
+    }catch(e){
+      alert('JSON inválido: ' + e.message);
+    }
+  };
+
+  // Exportar PNG
+  document.getElementById('btnPNG').onclick = () => {
+    const url = chart.toBase64Image('image/png', 1.0);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'grafico-linhas.png'; a.click();
+  };
+</script>
 </body>
 </html>
