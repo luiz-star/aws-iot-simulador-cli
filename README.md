@@ -2,10 +2,14 @@
 
 ## Simulação de dispositivo IoT no AWS CloudShell/CLI com MQTT
 
- Demonstração (GIF)
+## Demonstração (HTML interativo)
 
+Abra pelo GitHub Pages:
+- https://luiz-star.github.io/aws-iot-simulador-cli/assets/demo-gif-sintetico.html
+
+Opcional: GIF estático para visualização rápida (se existir no repo):
 <p align="center">
-  <img src="assets/demo-publish.gif" alt="Demonstração: publish no CloudShell e mensagens no MQTT Test Client" width="700">
+  <img src="assets/demo-publish.gif" alt="Demonstração: publish no CloudShell e mensagens no MQTT Test Client" width="720">
 </p>
 
 Este repositório demonstra:
