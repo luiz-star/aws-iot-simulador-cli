@@ -1,6 +1,12 @@
 # aws-iot-simulador-cli
 
-Simulação de dispositivo IoT no AWS CloudShell/CLI com MQTT
+## Simulação de dispositivo IoT no AWS CloudShell/CLI com MQTT
+
+ Demonstração (GIF)
+
+<p align="center">
+  <img src="assets/demo-publish.gif" alt="Demonstração: publish no CloudShell e mensagens no MQTT Test Client" width="700">
+</p>
 
 Este repositório demonstra:
 - Criação de um Thing no AWS IoT Core (opcional para o lab)
