@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráfico de Temperatura e Umidade</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div style="width: 75%; margin: auto;">
+        <canvas id="tempUmidadeChart"></canvas>
+    </div>
+    <script>
+        const ctx = document.getElementById('tempUmidadeChart').getContext('2d');
+        const tempUmidadeChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [0, 1, 2, 3, 4], // Iterações
+                datasets: [
+                    {
+                        label: 'Temperatura (°C)',
+                        data: [25, 26, 27, 28, 29],
+                        borderColor: 'red',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: true,
+                        tension: 0.4,
+                    },
+                    {
+                        label: 'Umidade (%)',
+                        data: [50, 51, 52, 53, 54],
+                        borderColor: 'blue',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        fill: true,
+                        tension: 0.4,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Gráfico de Temperatura e Umidade',
+                        font: {
+                            size: 18
+                        }
+                    },
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Iteração', // Rótulo do eixo X
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Valor', // Rótulo do eixo Y
+                            font: {
+                                size: 14
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
