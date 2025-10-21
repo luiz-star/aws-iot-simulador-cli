@@ -7,7 +7,16 @@
 Abra pelo GitHub Pages:
 - https://luiz-star.github.io/aws-iot-simulador-cli/assets/demo-gif-sintetico.html
 
-Opcional: GIF estático para visualização rápida (se existir no repo):
+<p>
+  <a href="https://luiz-star.github.io/aws-iot-simulador-cli/assets/demo-gif-sintetico.html">
+    ▶️ Abrir demonstração interativa
+  </a>
+</p>
+
+** Página interativa que reproduz o fluxo de mensagens IoT (CLI → tópico MQTT), exibindo logs e mensagens em tempo real e oferecendo exportação em GIF/PNG da demonstração.
+
+
+Opcional: GIF estático para visualização rápida:
 <p align="center">
   <img src="assets/demo-publish.gif" alt="Demonstração: publish no CloudShell e mensagens no MQTT Test Client" width="720">
 </p>
