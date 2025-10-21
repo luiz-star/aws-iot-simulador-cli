@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Demo IoT – GIF Sintético (CloudShell + MQTT Test Client)</title>
+<style>
+  :root{--bg:#0b1220;--card:#0f172a;--muted:#94a3b8;--term:#0c0f14;--green:#22c55e;--cyan:#22d3ee;--yellow:#facc15;--red:#ef4444;--border:#1f2a44;}
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#0a0f1a,#0b1220 40%,#0b1220);color:#e5e7eb;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+  header{padding:14px 18px;border-bottom:1px solid #152042;background:rgba(13,18,34,.85);backdrop-filter:saturate(140%) blur(6px);position:sticky;top:0;z-index:5}
+  header h1{margin:0;font-size:16px;font-weight:700}
+  .wrap{max-width:1100px;margin:22px auto;padding:0 14px}
+  .grid{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  .card{background:linear-gradient(180deg,#0f172a,#0a1223);border:1px solid #1a2542;border-radius:12px;overflow:hidden}
+  .card header{position:relative;background:#111a33;color:#cbd5e1;border-bottom:1px solid #1d2950}
+  .card header h2{font-size:14px;margin:0}
+  .term{background:#0b0f19;padding:12px;min-height:360px}
+  .logline{white-space:pre;line-height:1.35}
+  .faint{color:#64748b}
+  .ok{color:var(--green)}
+  .topic{color:var(--cyan)}
+  .warn{color:var(--yellow)}
+  .err{color:var(--red)}
+  .mqtt{background:#0b0f19;min-height:360px;padding:0}
+  .mqtt .toolbar{display:flex;gap:8px;align-items:center;padding:10px;border-bottom:1px solid #162346;color:#93c5fd}
+  .mqtt .messages{max-height:320px;overflow:auto;padding:10px}
+  .msg{background:#0f172a;border:1px solid #1c2746;border-radius:8px;padding:8px 10px;margin-bottom:8px}
+  .msg .meta{font-size:12px;color:#93c5fd;margin-bottom:4px}
+  .msg pre{margin:0;color:#e2e8f0}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  button{background:#0f172a;color:#e5e7eb;border:1px solid #1d2b4d;border-radius:8px;padding:8px 12px;cursor:pointer}
+  button:hover{background:#142045}
+  .hint{color:#94a3b8;font-size:12px;margin-top:6px}
+  footer{color:#94a3b8;font-size:12px;text-align:center;margin-top:10px}
+</style>
+</head>
+<body>
+<header><h1>Demo IoT – Publish no CloudShell + MQTT Test Client (GIF Sintético)</h1></header>
+<div class="wrap">
+  <div class="controls">
+    <button id="btnStart">Iniciar animação</button>
+    <button id="btnRecord">Gravar GIF (~10s)</button>
+    <span class="hint">Dica: após gerar, salve como assets/demo-publish.gif e referencie no README.</span>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <header><h2>CloudShell / AWS CLI</h2></header>
+      <div id="terminal" class="term"></div>
+    </section>
+
+    <section class="card">
+      <header><h2>MQTT Test Client</h2></header>
+      <div class="mqtt">
+        <div class="toolbar">Assinado em <code class="topic">iot/sensor</code> • Região <code>us-east-1</code></div>
+        <div id="messages" class="messages"></div>
+      </div>
+    </section>
+  </div>
+
+  <footer>Esta é uma simulação visual. Não há chamadas reais à AWS.</footer>
+</div>
+
+<!-- libs inline: gif capture via CCapture.js + Whammy (WebM) + gif.js -->
+<script>
+// Pequeno util para animação sintética e gravação GIF/WebM
+// CCapture (min) embutido:
+!function(){function n(n){this.data=[],this.size=0,this.add=function(n){this.data.push(n),this.size+=n.length}}function e(n){for(var e=[],t=0;t<n.length;t++){var r=n.charCodeAt(t);r<128?e.push(r):r<2048?e.push(192|r>>6,128|63&r):r<55296||r>=57344?e.push(224|r>>12,128|r>>6&63,128|63&r):(t++,r=65536+((1023&r)<<10|1023&n.charCodeAt(t)),e.push(240|r>>18,128|r>>12&63,128|r>>6&63,128|63&r))}return new Uint8Array(e)}function t(n,e){var t=new Blob(n,{type:e});return t}window.SimpleRecorder=function(a,o){o=o||{};let i=0,s=[],c=[];const l=o.fps||12,u=o.ms||10e3,d=a,m=a.getContext("2d"),f=document.createElement("canvas");f.width=a.width,f.height=a.height;const p=f.getContext("2d");let g,h=!1;function v(){if(!h)return;requestAnimationFrame(v);const n=Date.now();if(n-i>1e3/l){i=n,p.drawImage(d,0,0);const a=f.toDataURL("image/webp",.9);s.push(a),c.push(n),s.length*l*1000>u&&(h=!1,o.onStop&&o.onStop())}}return{start:function(){h=!0,i=0,s=[],c=[],v()},stop:function(){h=!1,o.onStop&&o.onStop()},exportGIF:async function(){// converte via gif.js (worker)
+const r=document.createElement("script");r.src="https://cdn.jsdelivr.net/npm/gif.js.optimized/dist/gif.worker.js";return new Promise(async resolve=>{const gjs=document.createElement("script");gjs.src="https://cdn.jsdelivr.net/npm/gif.js.optimized/dist/gif.js";gjs.onload=async()=>{const gif=new window.GIF({workers:2,quality:15,workerScript:r.src,width:f.width,height:f.height});for(const a of s){await new Promise(res=>{const img=new Image;img.onload=()=>{gif.addFrame(img,{delay:1000/l,copy:true});res()};img.src=a})}gif.on('finished',blob=>{resolve(blob)});gif.render()};document.body.appendChild(gjs)})},frames:s,getCanvas:f}}()}();
+</script>
+
+<script>
+const terminal = document.getElementById('terminal');
+const messages = document.getElementById('messages');
+const btnStart = document.getElementById('btnStart');
+const btnRecord = document.getElementById('btnRecord');
+
+function el(tag, cls, html){
+  const e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(html !== undefined) e.innerHTML = html;
+  return e;
+}
+
+function addTermLine(text, cls){
+  const line = el('div', 'logline ' + (cls||''), text);
+  terminal.appendChild(line);
+  terminal.scrollTop = terminal.scrollHeight;
+}
+
+function addMessage(obj){
+  const w = el('div','msg');
+  const meta = el('div','meta', `iot/sensor • ${new Date().toISOString()}`);
+  const pre = el('pre'); pre.textContent = JSON.stringify(obj,null,2);
+  w.appendChild(meta); w.appendChild(pre);
+  messages.appendChild(w);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+let iter = 0, animRunning=false, intervalId=null;
+
+function step(){
+  iter++;
+  const temp = +(25 + Math.sin(iter/2)*2 + Math.random()*0.5).toFixed(1);
+  const umi  = +(50 + Math.cos(iter/2)*2 + Math.random()*0.7).toFixed(1);
+  const payload = { iteracao: iter, temperatura: temp, umidade: umi, timestamp: new Date().toISOString() };
+
+  addTermLine(`$ aws iot-data publish --topic iot/sensor --payload '${JSON.stringify(payload)}'`, 'faint');
+  addTermLine(`✔ published to topic iot/sensor`, 'ok');
+  if(iter===1) addTermLine(`region: us-east-1  | identity: CloudShell`, 'faint');
+
+  addMessage(payload);
+
+  if(iter>=6){ // ~6 passos ~10s com delays
+    clearInterval(intervalId);
+    animRunning=false;
+  }
+}
+
+btnStart.onclick = ()=>{
+  if(animRunning) return;
+  terminal.innerHTML = '';
+  messages.innerHTML = '';
+  iter = 0;
+  animRunning = true;
+  addTermLine(`bash src/scripts/publish-loop.sh`, 'topic');
+  addTermLine(`Iniciando publicação...`, 'warn');
+  intervalId = setInterval(step, 1500);
+  step();
+};
+
+// Gravação de GIF usando canvas de captura da página
+let recorder=null, capCanvas=null, capCtx=null, animRAF=null;
+
+function ensureCaptureCanvas(){
+  if(capCanvas) return capCanvas;
+  capCanvas = document.createElement('canvas');
+  document.body.appendChild(capCanvas);
+  const r = document.querySelector('.wrap').getBoundingClientRect();
+  const scale = window.devicePixelRatio || 1;
+  capCanvas.width = Math.min(1100, window.innerWidth-20) * scale;
+  capCanvas.height = (r.height+40) * scale;
+  capCanvas.style.display='none';
+  capCtx = capCanvas.getContext('2d');
+  return capCanvas;
+}
+
+async function drawToCanvas(){
+  const scale = window.devicePixelRatio || 1;
+  const wrap = document.querySelector('.wrap');
+  const rect = wrap.getBoundingClientRect();
+  capCtx.fillStyle = getComputedStyle(document.body).backgroundColor || '#0b1220';
+  capCtx.fillRect(0,0,capCanvas.width,capCanvas.height);
+  // usa html2canvas simplificada via SVG foreignObject
+  const xml = new XMLSerializer().serializeToString(wrap);
+  const svg = new Blob([`<svg xmlns="http://www.w3.org/2000/svg" width="${capCanvas.width}" height="${capCanvas.height}">
+  <foreignObject width="100%" height="100%">${xml}</foreignObject></svg>`], {type: 'image/svg+xml;charset=utf-8'});
+  const url = URL.createObjectURL(svg);
+  const img = new Image();
+  await new Promise(res=>{img.onload=()=>{capCtx.drawImage(img,0,0); URL.revokeObjectURL(url); res();}; img.src=url;});
+}
+
+btnRecord.onclick = async ()=>{
+  // garante animação rolando
+  if(!animRunning) btnStart.click();
+
+  ensureCaptureCanvas();
+  recorder = new SimpleRecorder(capCanvas, { fps: 12, ms: 10000, onStop: async ()=>{
+      const blob = await recorder.exportGIF();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'demo-iot.gif';
+      a.click();
+    }});
+
+  // captura ~10s
+  recorder.start();
+  const endAt = Date.now() + 10000;
+  (async function loop(){
+    if(Date.now()>endAt){ recorder.stop(); return; }
+    await drawToCanvas();
+    requestAnimationFrame(loop);
+  })();
+};
+</script>
+</body>
+</html>
