@@ -44,6 +44,33 @@ Opcional: GIF estático para visualização rápida:
 - Visualização em tempo real no Cliente de Teste MQTT
 - Automação com scripts Bash
 - Geração/visualização de gráfico (PNG e HTML interativo)
+  
+
+```mermaid
+flowchart LR
+    subgraph Dev["Dev / Local"]
+        CLI["aws-iot-simulador-cli\n(Bash/Make)"]
+        CSV["CSV sintético\n(amostras)"]
+        HTML["Gráfico HTML\n(demo interativa)"]
+    end
+
+    subgraph AWS["AWS"]
+        IOT["AWS IoT Core\n(MQTT Broker)"]
+        TCLIENT["MQTT Test Client\n(Console AWS)\n(subscribe genérico)"]
+    end
+
+    CLI -- "PUBLISH\nTopic: iot/sim/demo\nQoS: 1\nPayload: JSON" --> IOT
+    IOT <-- "SUBSCRIBE (genérico)\nvisualiza mensagens" --> TCLIENT
+
+    CLI -- "gera" --> CSV
+    CLI -- "gera" --> HTML
+
+    classDef comp fill:#0b5,stroke:#083,stroke-width:1,color:#fff;
+    classDef svc fill:#1f6feb,stroke:#0a3069,stroke-width:1,color:#fff;
+
+    class CLI,CSV,HTML comp
+    class IOT,TCLIENT svc
+```
 
 ## Links rápidos
 - Guia detalhado: [docs/guia-lab.md](docs/guia-lab.md)
@@ -78,6 +105,25 @@ CloudShell / AWS CLI  → (publish iot/sensor) →  AWS IoT Core (MQTT)  ← (su
 - AWS CLI v2 (o CloudShell já possui)
 - Permissão `iot:Publish` no tópico configurado
 - Mesma região em CloudShell e IoT Core (ex.: `us-east-1`)
+
+```mermaid
+sequenceDiagram
+    %% Sequência da demo do simulador publicando no AWS IoT Core e visualizando no Test Client
+    participant Dev as CLI (cli-sim-001)
+    participant IoT as AWS IoT Core (MQTT Broker)
+    participant Test as MQTT Test Client (genérico)
+
+    Dev->>IoT: CONNECT clientId=cli-sim-001
+    Note right of IoT: Autenticação por certificado/credenciais
+
+    Dev->>IoT: PUBLISH topic=iot/sim/demo<br/>QoS=1<br/>payload={...}
+    IoT-->>Dev: PUBACK (QoS 1 confirmado)
+
+    IoT-->>Test: Entrega mensagem aos subscribers
+    Note over Test: Test Client subscrito genericamente<br/>exibe o payload em tempo real
+
+    Dev-->>Dev: Gera CSV e HTML localmente<br/>(demo/gráfico interativo)
+```
 
 ## Guia rápido (5 min)
 
