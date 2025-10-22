@@ -1,5 +1,8 @@
 # aws-iot-simulador-cli
 
+<img width="623" height="618" alt="image" src="https://github.com/user-attachments/assets/07203db1-ef40-4d99-86ce-248f46abf552" />
+
+
 ## Simulação de dispositivo IoT no AWS CloudShell/CLI com MQTT
 
 ## Demonstração (HTML interativo)
