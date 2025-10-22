@@ -21,14 +21,31 @@ Opcional: GIF estático para visualização rápida:
   <img src="assets/demo-publish.gif" alt="Demonstração: publish no CloudShell e mensagens no MQTT Test Client" width="720">
 </p>
 
-Este repositório demonstra:
+## Status e Projeto
+
+[![Shellcheck](https://img.shields.io/github/actions/workflow/status/luiz-star/aws-iot-simulador-cli/shellcheck.yml?branch=main&label=Shellcheck)](https://github.com/luiz-star/aws-iot-simulador-cli/actions)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
+- Project (kanban/roadmap): https://github.com/users/luiz-star/projects
+- View deste projeto: adicione aqui a URL direta do board (Portfólio IoT — Roadmap)
+
+  ## Destaques concluídos
+
+- CI: Shellcheck para scripts Bash, com artefatos de relatório e badges no README.
+- README: seção “Como rodar” e “Pré-requisitos” com comandos copy-paste.
+- make demo: geração de CSV sintético e gráfico HTML interativo em assets/.
+- Diagrama Mermaid do fluxo IoT (CLI → AWS IoT Core → MQTT Test Client).
+- Demo interativa publicada no GitHub Pages (HTML autônomo).
+  
+
+## Este repositório demonstra:
 - Criação de um Thing no AWS IoT Core (opcional para o lab)
 - Publicação de leituras de sensores via AWS CLI (no CloudShell)
 - Visualização em tempo real no Cliente de Teste MQTT
 - Automação com scripts Bash
 - Geração/visualização de gráfico (PNG e HTML interativo)
 
-Links rápidos
+## Links rápidos
 - Guia detalhado: [docs/guia-lab.md](docs/guia-lab.md)
 - Diagrama: [docs/diagrama-aws-iot.png](docs/diagrama-aws-iot.png)
 - Scripts: [src/scripts/publish-once.sh](src/scripts/publish-once.sh) | [src/scripts/publish-loop.sh](src/scripts/publish-loop.sh)
@@ -36,7 +53,7 @@ Links rápidos
 - Gráfico interativo (HTML): [assets/grafico-linhas.html](assets/grafico-linhas.html)
   - Abrir diretamente (Raw): https://raw.githubusercontent.com/luiz-star/aws-iot-simulador-cli/main/assets/grafico-linhas.html
 
-Sumário
+## Sumário
 - Arquitetura
 - Pré-requisitos
 - Guia rápido (5 min)
